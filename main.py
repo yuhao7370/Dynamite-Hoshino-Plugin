@@ -287,17 +287,6 @@ async def Rcalc(bot, ev: CQEvent):
     else:
         await bot.finish(ev, f'目前有两种计算方式\n/dyR 定数 Acc\n/dyR 定数 Perfect Good Miss', at_sender=True)
 
-@sv.on_prefix(('/dyuuid'))
-async def dyuuid(bot, ev: CQEvent):
-    qqid = ev.user_id
-    args = ev.message.extract_plain_text().strip().split('\n')
-    if(len(args) == 1):
-        userId = args[0]
-
-    idp = requests.post(f"http://43.142.173.63:10443/bomb/user/search/{userId}")
-    id = json.loads(idp.content.decode("utf-8"))
-    await bot.send(ev, f'{id["data"]["_id"]}')
-
 
 @sv.on_prefix(('/textdyb20'))
 async def dyb20(bot, ev: CQEvent):
