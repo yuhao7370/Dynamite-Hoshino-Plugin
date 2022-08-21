@@ -4,6 +4,8 @@
 
 项目地址：https://github.com/yuhao7370/Dynamite-Hoshino-Plugin
 
+主播的b站：https://space.bilibili.com/275661582
+
 **该插件不保证后续更新
 
 # 使用方法
