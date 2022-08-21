@@ -248,7 +248,7 @@ def ranks(score):
     elif( 400000 <= score < 500000):
         img = open_img(os.path.join(res_path, f"ranks/UI1_Difficulties_8.png"))
         return img
-    img = open_img("res/ranks/UI1_Difficulties_9.png")
+    img = open_img(os.path.join(res_path, f"ranks/UI1_Difficulties_9.png"))
     return img
 
 @sv.on_prefix(('/dyR'))
@@ -328,7 +328,7 @@ async def dyb20(bot, ev: CQEvent):
         try:
             diff = Difficulties[chartinfo["data"]["difficultyClass"]] + str(chartinfo["data"]["difficultyValue"])
         except:
-            illegal += '发现非法谱面\n'
+            illegal += f'发现非法谱面{chartId}\n'
 
         sets = requests.post(f"http://43.142.173.63:10443/bomb/set/by-chart/{chartId}")
         songinfo = sets.content.decode("utf-8")
@@ -339,7 +339,8 @@ async def dyb20(bot, ev: CQEvent):
             totalr += R
             msg += songinfo["musicName"] + f"\n{diff} " +"R:" + str(R) + "\n\n"
         except:
-            illegal += f'{chartId}\n'
+            msg += songinfo["musicName"] + f"\n{diff} " +"R:" + str(R) + "\n\n"
+            R = 0
         
         # await bot.send(ev, f'{songinfo}')
     msg += "TotalR: " + str(totalr)
@@ -357,8 +358,8 @@ async def dyb20pic(bot, ev: CQEvent):
     Difficulties = ["", "CASUAL",  "NORMAL", "HARD", "MEGA", "GIGA", "TERA"]
     qqid = ev.user_id
     args = ev.message.extract_plain_text().strip().split()
-    if(qqid == "2307957938"):  
-        await bot.finish(ev, f'不能查询NyaBye130的Best20成绩', at_sender=True)
+    # if(qqid == "2307957938"):  
+    #     await bot.finish(ev, f'不能查询NyaBye130的Best20成绩', at_sender=True)
     if(len(args) == 1):
         userId = args[0]
         idp = requests.post(f"http://43.142.173.63:10443/bomb/user/search/{userId}")
@@ -389,6 +390,7 @@ async def dyb20pic(bot, ev: CQEvent):
         try:
             diff = Difficulties[chartinfo["data"]["difficultyClass"]] + str(chartinfo["data"]["difficultyValue"])
         except:
+            illegal += f'发现非法谱面{chartId}\n'
             continue
 
         sets = requests.post(f"http://43.142.173.63:10443/bomb/set/by-chart/{chartId}")
@@ -401,7 +403,9 @@ async def dyb20pic(bot, ev: CQEvent):
             R = Decimal(song["RScore"]).quantize(Decimal("1"), rounding = "ROUND_HALF_UP")
             totalr += R
         except:
-            illegal += f'发现非法谱面{chartId}\n'
+            songinfo = songinfo["data"]
+            _id = songinfo['_id']
+            R = 0
         
         recordlist.append((songinfo["musicName"], _id, chartinfo["data"]["difficultyClass"], chartinfo["data"]["difficultyValue"], song ["score"], song["scoreDetail"], R))
 
@@ -456,7 +460,7 @@ async def dyb20pic(bot, ev: CQEvent):
         
         img = DrawText(img, x + 530, y + 131, 37, f"{song_score}".zfill(7), phifont, (255, 255, 255, 255), anchor='ls').draw_text() #分数
         p, g, m = scoreDetail["perfect"], scoreDetail["good"], scoreDetail["miss"]
-        acc = Decimal((p + g * 0.5 + m) / (p + g + m) * 100.0).quantize(Decimal("0.01"), rounding = "ROUND_HALF_UP")
+        acc = Decimal((p + g * 0.5) / (p + g + m) * 100.0).quantize(Decimal("0.01"), rounding = "ROUND_HALF_UP")
         img = DrawText(img, x + 738, y + 131, 27, f"{acc}%", phifont, (255, 255, 255, 255), anchor='ls').draw_text() #acc
         
         rankimg = ranks(song_score)
