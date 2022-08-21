@@ -31,4 +31,4 @@
 | :---------------- | :------- | :-------------------- | :------------------------------ |
 | /dyb20            | 查询B20        |  [playerid]          | 查询自己的B20成绩(图片)      |
 | /textdyb20        | 查询B20(文字版) |  [playerid]         | 查询自己的B20成绩(文字)      |
-| /dyR        | 计算R值 |  [Rating acc] [Rating Perfect Good Miss]        | 通过定数+acc或者定数+误差计算R值     |
+| /dyR        | 计算R值 |  [Rating acc] [Rating Perfect Good Miss]     | 通过定数+acc或者定数+误差计算R值     |
