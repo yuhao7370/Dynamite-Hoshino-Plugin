@@ -403,9 +403,13 @@ async def dyb20pic(bot, ev: CQEvent):
             R = Decimal(song["RScore"]).quantize(Decimal("1"), rounding = "ROUND_HALF_UP")
             totalr += R
         except:
-            songinfo = songinfo["data"]
-            _id = songinfo['_id']
-            R = 0
+            try:
+                # songinfo = songinfo["data"]
+                _id = songinfo['_id']
+                R = 0
+            except:
+                print(songinfo)
+                continue
         
         recordlist.append((songinfo["musicName"], _id, chartinfo["data"]["difficultyClass"], chartinfo["data"]["difficultyValue"], song ["score"], song["scoreDetail"], R))
 
@@ -486,5 +490,6 @@ async def dyb20pic(bot, ev: CQEvent):
     base64str = img2b64(img)
     msg = MessageSegment.image(base64str)
     await bot.send(ev, msg)    
+    print(illegal)
     # await bot.send(ev, f'[CQ:image,file={img}]', at_sender=True)
     # await bot.finish(ev, f'{msg}', at_sender=True)
