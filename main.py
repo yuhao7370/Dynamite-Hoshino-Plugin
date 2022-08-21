@@ -3,13 +3,20 @@ from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageEnhance
 from decimal import *
 from hoshino.config import SUPERUSERS
 from hoshino import Service, priv ,util
-from hoshino.typing import CQEvent
+from hoshino.typing import CQEvent, MessageSegment
 from hoshino.log import new_logger
 from io import BytesIO
-from aiocqhttp.message import MessageSegment
+# from aiocqhttp.message import MessageSegment
 
 sv = Service('Dynamite', manage_priv = priv.ADMIN, enable_on_default = True, visible = True)
 
+def SearchFiles(directory, fileType):      
+    fileList=[]    
+    for root, subDirs, files in os.walk(directory):
+        for fileName in files:
+            if fileName.endswith(fileType):
+                fileList.append(os.path.join(root,fileName))
+    return fileList
 
 class DrawText:
     def __init__(self, 
@@ -251,6 +258,15 @@ def ranks(score):
     img = open_img(os.path.join(res_path, f"ranks/UI1_Difficulties_9.png"))
     return img
 
+def get_account(qqid: str):
+    account_path = os.path.join(os.path.dirname(__file__), 'account.json')
+    with open(account_path, "r") as f:
+        account = json.load(f)
+    try:
+        return True, account[qqid]["name"]
+    except:
+        return False, ""
+
 @sv.on_prefix(('/dyR'))
 async def Rcalc(bot, ev: CQEvent):
     qqid = ev.user_id
@@ -287,6 +303,39 @@ async def Rcalc(bot, ev: CQEvent):
     else:
         await bot.finish(ev, f'目前有两种计算方式\n/dyR 定数 Acc\n/dyR 定数 Perfect Good Miss', at_sender=True)
 
+@sv.on_prefix(('/dy绑定', '/dybind'))
+async def bind(bot, ev: CQEvent):
+    qqid = ev.user_id
+    userId = ev.message.extract_plain_text().strip()
+    # await bot.send(ev, "1111111111111111111111111")
+    try:   
+        account_path = os.path.join(os.path.dirname(__file__), 'account.json')
+        with open(account_path, "r") as f:
+            account = json.load(f)
+        
+        idp = requests.post(f"http://43.142.173.63:10443/bomb/user/search/{userId}")
+        id = json.loads(idp.content.decode("utf-8"))
+        uuid = id["data"]["_id"]
+
+        try:
+            olduuid = account[str(qqid)]["uuid"]
+            oldname = account[str(qqid)]["name"]
+
+            account[str(qqid)]["uuid"] = uuid
+            account[str(qqid)]["name"] = userId
+            await bot.send(ev, f"Q{qqid}已成功换绑{userId}\n原账号:{oldname}",at_sender = True)
+
+        except:
+            account[str(qqid)] = {}
+            account[str(qqid)]["uuid"] = uuid
+            account[str(qqid)]["name"] = userId
+            await bot.send(ev, f"Q{qqid}已成功绑定{userId}",at_sender = True)
+
+        with open(account_path, 'w', encoding = 'utf8') as f:
+            json.dump(account, f, indent = 4, ensure_ascii=False)
+
+    except:
+        await bot.send(ev, f"绑定失败，未找到账号{userId}")
 
 @sv.on_prefix(('/textdyb20'))
 async def dyb20(bot, ev: CQEvent):
@@ -356,9 +405,14 @@ async def dyb20pic(bot, ev: CQEvent):
         userId = id["data"]["_id"] 
         username = id["data"]["username"]
     else:
-        userId = args[0]
-        username = "Guest"
-
+        flag, userId = get_account(str(qqid))
+        if(flag == False):
+            await bot.finish(ev, f'您还未绑定，请用/dybind指令绑定', at_sender=True)
+        else:
+            idp = requests.post(f"http://43.142.173.63:10443/bomb/user/search/{userId}")
+            id = json.loads(idp.content.decode("utf-8"))
+            userId = id["data"]["_id"] 
+            username = id["data"]["username"]
 
     await bot.send(ev, f'正在查询{username}的Best20成绩', at_sender=True)
     recordlist = []
@@ -482,3 +536,20 @@ async def dyb20pic(bot, ev: CQEvent):
     print(illegal)
     # await bot.send(ev, f'[CQ:image,file={img}]', at_sender=True)
     # await bot.finish(ev, f'{msg}', at_sender=True)
+
+@sv.on_prefix(('/NyaBye130','/nyabye130','/NyaBye','/nyabye','/喵拜'))
+async def nyabye(bot, ev: CQEvent):
+    qqid = ev.user_id
+    args = ev.message.extract_plain_text().strip().split()
+    if(args[0] == "overdose"):
+        res_path = os.path.join(os.path.dirname(__file__), "res")
+        record_path = os.path.join(res_path, "NYABYE130 OVERDOSE.wav")
+        voice_rec = MessageSegment.record(f'file:///{os.path.abspath(record_path)}')
+        await bot.finish(ev, voice_rec)
+
+    res_path = os.path.join(os.path.dirname(__file__), "res")
+    record_path = os.path.join(res_path, "NyaBye130")
+    list = SearchFiles(record_path, "wav")
+    record_path = random.choice(list)
+    voice_rec = MessageSegment.record(f'file:///{os.path.abspath(record_path)}')
+    await bot.send(ev, voice_rec)
