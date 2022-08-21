@@ -4,7 +4,11 @@
 
 项目地址：https://github.com/yuhao7370/Dynamite-Hoshino-Plugin
 
-主播的b站：https://space.bilibili.com/275661582
+主播的b站：[yuhao7370](https://space.bilibili.com/275661582)
+
+特别感谢[@Crazy___Bull](https://space.bilibili.com/335803482)提供的R值拟合公式
+以及[@Taskeren-3](https://space.bilibili.com/27656565)的Explode后端
+
 
 **该插件不保证后续更新
 
