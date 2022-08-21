@@ -541,15 +541,16 @@ async def dyb20pic(bot, ev: CQEvent):
 async def nyabye(bot, ev: CQEvent):
     qqid = ev.user_id
     args = ev.message.extract_plain_text().strip().split()
-    if(args[0] == "overdose"):
+    try:
+        if(args[0] == "overdose"):
+            res_path = os.path.join(os.path.dirname(__file__), "res")
+            record_path = os.path.join(res_path, "NYABYE130 OVERDOSE.wav")
+            voice_rec = MessageSegment.record(f'file:///{os.path.abspath(record_path)}')
+            await bot.finish(ev, voice_rec)
+    except:
         res_path = os.path.join(os.path.dirname(__file__), "res")
-        record_path = os.path.join(res_path, "NYABYE130 OVERDOSE.wav")
+        record_path = os.path.join(res_path, "NyaBye130")
+        list = SearchFiles(record_path, "wav")
+        record_path = random.choice(list)
         voice_rec = MessageSegment.record(f'file:///{os.path.abspath(record_path)}')
-        await bot.finish(ev, voice_rec)
-
-    res_path = os.path.join(os.path.dirname(__file__), "res")
-    record_path = os.path.join(res_path, "NyaBye130")
-    list = SearchFiles(record_path, "wav")
-    record_path = random.choice(list)
-    voice_rec = MessageSegment.record(f'file:///{os.path.abspath(record_path)}')
-    await bot.send(ev, voice_rec)
+        await bot.send(ev, voice_rec)
