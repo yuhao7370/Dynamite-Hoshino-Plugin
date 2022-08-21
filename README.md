@@ -15,7 +15,7 @@
 
 1. 将该项目放在HoshinoBot插件目录 `modules` 下，或者clone本项目 `git clone https://github.com/yuhao7370/Dynamite-Hoshino-Plugin.git`
 2. pip安装依赖，缺啥装啥就行，善用百度
-3. 在`config/__bot__.py`模块列表中添加`Dynamite
+3. 将插件文件夹改名为`Dynamite`并在`config/__bot__.py`模块列表中添加`Dynamite
 4. 解压res.zip
 
 # 更新说明
