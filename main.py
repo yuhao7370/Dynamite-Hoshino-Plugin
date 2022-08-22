@@ -33,14 +33,14 @@ import traceback
 from decimal import *
 from io import BytesIO
 
-import requests
 from PIL import Image, ImageDraw, ImageFont
 
-from bomb import BombApi
-from best20image import draw_best20
-from r_calc import calc_r
 from hoshino import Service, priv
 from hoshino.typing import CQEvent, MessageSegment
+
+from .r_calc import calc_r
+from .best20image import draw_best20
+from .bomb import BombApi
 
 sv = Service('Dynamite', manage_priv=priv.ADMIN, enable_on_default=True, visible=True)
 
@@ -82,7 +82,7 @@ def get_account(qq_id: str):
     with open(account_path, "r", encoding='utf8') as f:
         account = json.load(f)
     try:
-        return True, account[qq_id]["name"]
+        return True, account[qq_id]["uuid"]
     except Exception:
         return False, ""
 
@@ -247,10 +247,13 @@ async def command_dyb20pic(bot, ev: CQEvent):
 
     await bot.send(ev, f'正在查询{username}的Best20成绩', at_sender=True)
 
-    img = draw_best20(bomb, user_id)
-    base64str = img2b64(img)
-    msg = MessageSegment.image(base64str)
-    await bot.send(ev, msg)
+    try:
+        img = draw_best20(bomb, user_id)
+        base64str = img2b64(img)
+        msg = MessageSegment.image(base64str)
+        await bot.send(ev, msg)
+    except Exception as e:
+        await bot.send(ev, f"查询时出现错误：{e}")
     # await bot.send(ev, f'[CQ:image,file={img}]', at_sender=True)
     # await bot.finish(ev, f'{msg}', at_sender=True)
 

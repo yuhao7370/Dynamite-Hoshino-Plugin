@@ -2,9 +2,8 @@ import os
 from decimal import Decimal
 
 from PIL import Image, ImageDraw, ImageFont
-from PIL.Image import Resampling
 
-from bomb import BombApi
+from .bomb import BombApi
 
 tan75 = 0.266
 
@@ -50,7 +49,7 @@ def get_illustration_image(path, wto, hto) -> Image:
         image = image.crop(box=(int((w - w2) / 2), 0, int((w + w2) / 2), h))
     else:
         image = image.crop(box=(0, int((h - h2) / 2), w, int((h + h2) / 2)))
-    image = image.resize((wto, hto), Resampling.LANCZOS)
+    image = image.resize((wto, hto), Image.ANTIALIAS)
     width, height = image.size
     mask = Image.new('L', image.size, color=255)
     draw = ImageDraw.Draw(mask)
@@ -62,7 +61,7 @@ def get_illustration_image(path, wto, hto) -> Image:
 
 def draw_text(
         image: Image.Image,
-        position: (float, float),
+        position,
         text: str,
         font_size: int,
         font_path: str,
@@ -145,7 +144,7 @@ def draw_best20(bomb: BombApi, user_id: str):
             continue
         set_id = set_info["id"]
         music_name = set_info["music-name"]
-        r = Decimal(set_info["r"] if None else 0).quantize(Decimal("1"), rounding="ROUND_HALF_UP")
+        r = Decimal(record["r"]).quantize(Decimal("1"), rounding="ROUND_HALF_UP")
         total_r += r
 
         # 绘制
@@ -188,7 +187,7 @@ def draw_best20(bomb: BombApi, user_id: str):
         image = draw_text(image, (x + 738, y + 131), f"{accuracy}%", 27, phi_font_path, anchor="ls")
         # 成绩类型图标
         rank_image = get_score_rank_image(score)
-        rank_image = rank_image.resize((115, 115), Resampling.LANCZOS)
+        rank_image = rank_image.resize((115, 115), Image.ANTIALIAS)
         image.alpha_composite(rank_image, (x + 392, y + 80))
         # 成绩细节
         image = draw_text(image, (x + 525, y + 190), "Perfect", 22, phi_font_path, (255, 183, 0, 255), anchor="ls")

@@ -107,15 +107,15 @@ class BombApi:
 
 
 if __name__ == '__main__':
-    example_user_id = "27c479a9-28eb-4b8e-990f-71f790ee02b2"
+    example_user_id = "3400cba2-cd86-43d3-ace4-0da1a92481c9"
     example_set_id = "0nz4pnpk1u64phyhqvyh1gi6"
     example_chart_id = "ki1ck8wqlntsyl48688e0159"
 
-    api = BombApi("http://localhost:10443/v1", username="Taskeren", password="123456")
+    api = BombApi("http://43.142.173.63:10443/v1", username="Taskeren", password="123456")
 
-    print(api.get_set(example_set_id))
+    # print(api.get_set(example_set_id))
     # print(api.get_set_by_name("Intel Sound Logo"))
-    print(api.get_chart(example_chart_id))
+    # print(api.get_chart(example_chart_id))
     # print(api.get_user(example_user_id))
     # print(api.get_user_by_name("Taskeren"))
     # print(api.get_user_best_records_score(example_user_id))
