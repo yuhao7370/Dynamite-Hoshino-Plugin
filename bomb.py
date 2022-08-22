@@ -59,10 +59,10 @@ class BombApi:
         return decode_json(self.get_content(f"{self.api_url}/set/{set_id}"))
 
     def get_set_by_name(self, music_name):
-        return decode_json(self.post_content(f"{self.api_url}/set/by-name", data=music_name))
+        return decode_json(self.post_content(f"{self.api_url}/set/by-name", json_data=music_name))
 
     def get_set_by_chart_id(self, chart_id):
-        return decode_json(self.post_content(f"{self.api_url}/set/by-chart", data=chart_id))
+        return decode_json(self.post_content(f"{self.api_url}/set/by-chart", json_data=chart_id))
 
     def get_chart(self, chart_id):
         return decode_json(self.get_content(f"{self.api_url}/chart/{chart_id}"))
@@ -71,7 +71,7 @@ class BombApi:
         return decode_json(self.get_content(f"{self.api_url}/user/{user_id}"))
 
     def get_user_by_name(self, username):
-        return decode_json(self.post_content(f"{self.api_url}/user/by-name", data=username))
+        return decode_json(self.post_content(f"{self.api_url}/user/by-name", json_data=username))
 
     def get_user_best_records_score(self, user_id):
         return decode_json(self.get_content(f"{self.api_url}/user/{user_id}/best20/s"))

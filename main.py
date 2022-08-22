@@ -44,7 +44,7 @@ from hoshino.typing import CQEvent, MessageSegment
 
 sv = Service('Dynamite', manage_priv=priv.ADMIN, enable_on_default=True, visible=True)
 
-bomb = BombApi("http://localhost:10443/v1")
+bomb = BombApi("http://43.142.173.63:10443/v1")
 
 
 def search_files(directory, file_extension):
@@ -88,7 +88,7 @@ def get_account(qq_id: str):
 
 
 @sv.on_prefix('/dyR')
-async def r_calc(bot, ev: CQEvent):
+async def command_r_calc(bot, ev: CQEvent):
     args = ev.message.extract_plain_text().strip().split()
 
     if len(args) == 2:
@@ -125,32 +125,29 @@ async def r_calc(bot, ev: CQEvent):
 
 
 @sv.on_prefix(('/dy绑定', '/dybind'))
-async def bind(bot, ev: CQEvent):
+async def command_bind(bot, ev: CQEvent):
     qq_id = ev.user_id
-    userId = ev.message.extract_plain_text().strip()
-    userId = userId.strip()
-    # await bot.send(ev, "1111111111111111111111111")
+    username = ev.message.extract_plain_text().strip()
+    username = username.strip()
     try:
         account_path = os.path.join(os.path.dirname(__file__), 'account.json')
         with open(account_path, "r", encoding='utf8') as f:
             account = json.load(f)
 
-        idp = requests.post(f"http://43.142.173.63:10443/bomb/user/search/{userId}")
-        user_info = json.loads(idp.content.decode("utf-8"))
-        uuid = user_info["data"]["_id"]
+        user_id = bomb.get_user_by_name(username)["id"]
 
         try:
             old_name = account[str(qq_id)]["name"]
 
-            account[str(qq_id)]["uuid"] = uuid
-            account[str(qq_id)]["name"] = userId
-            await bot.send(ev, f"Q{qq_id}已成功换绑{userId}\n原账号:{old_name}", at_sender=True)
+            account[str(qq_id)]["uuid"] = user_id
+            account[str(qq_id)]["name"] = username
+            await bot.send(ev, f"Q{qq_id}已成功换绑{username}\n原账号:{old_name}", at_sender=True)
 
         except Exception:
             account[str(qq_id)] = {}
-            account[str(qq_id)]["uuid"] = uuid
-            account[str(qq_id)]["name"] = userId
-            await bot.send(ev, f"Q{qq_id}已成功绑定{userId}", at_sender=True)
+            account[str(qq_id)]["uuid"] = user_id
+            account[str(qq_id)]["name"] = username
+            await bot.send(ev, f"Q{qq_id}已成功绑定{username}", at_sender=True)
 
         with open(account_path, 'w', encoding='utf8') as f:
             json.dump(account, f, indent=4, ensure_ascii=False)
@@ -231,7 +228,7 @@ async def bind(bot, ev: CQEvent):
 #         username = id["data"]["username"]
 
 @sv.on_prefix('/dyb20')
-async def dyb20pic(bot, ev: CQEvent):
+async def command_dyb20pic(bot, ev: CQEvent):
     qq_id = ev.user_id
     args = ev.message.extract_plain_text().strip().split()
     # if(qq_id == "2307957938"):
@@ -250,7 +247,7 @@ async def dyb20pic(bot, ev: CQEvent):
 
     await bot.send(ev, f'正在查询{username}的Best20成绩', at_sender=True)
 
-    img = draw_best20(user_id)
+    img = draw_best20(bomb, user_id)
     base64str = img2b64(img)
     msg = MessageSegment.image(base64str)
     await bot.send(ev, msg)
@@ -259,7 +256,7 @@ async def dyb20pic(bot, ev: CQEvent):
 
 
 @sv.on_prefix(('/NyaBye130', '/nyabye130', '/NyaBye', '/nyabye', '/喵拜'))
-async def nyabye(bot, ev: CQEvent):
+async def command_nyabye(bot, ev: CQEvent):
     args = ev.message.extract_plain_text().strip().split()
     flag = True
     try:

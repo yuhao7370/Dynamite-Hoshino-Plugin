@@ -2,10 +2,9 @@ import os
 from decimal import Decimal
 
 from PIL import Image, ImageDraw, ImageFont
+from PIL.Image import Resampling
 
 from bomb import BombApi
-
-bomb = BombApi("http://localhost:10443/v1")
 
 tan75 = 0.266
 
@@ -51,7 +50,7 @@ def get_illustration_image(path, wto, hto) -> Image:
         image = image.crop(box=(int((w - w2) / 2), 0, int((w + w2) / 2), h))
     else:
         image = image.crop(box=(0, int((h - h2) / 2), w, int((h + h2) / 2)))
-    image = image.resize((wto, hto), Image.ANTIALIAS)
+    image = image.resize((wto, hto), Resampling.LANCZOS)
     width, height = image.size
     mask = Image.new('L', image.size, color=255)
     draw = ImageDraw.Draw(mask)
@@ -115,7 +114,7 @@ def get_score_rank_image(score) -> Image.Image:
         return open_image(os.path.join(resource_path, "ranks/UI1_Difficulties_9.png"))
 
 
-def draw_best20(user_id: str):
+def draw_best20(bomb: BombApi, user_id: str):
     username = bomb.get_user(user_id)["username"]
     records = bomb.get_user_best_records_r_value(user_id)
 
@@ -132,11 +131,18 @@ def draw_best20(user_id: str):
         good = record["good"]
         miss = record["miss"]
         chart_id = record["chart-id"]
-        chart_info = bomb.get_chart(chart_id)
+        try:
+            chart_info = bomb.get_chart(chart_id)
+        except Exception:
+            continue
         difficulty_num = chart_info["difficulty-class"]
         difficulty_value = chart_info["difficulty-value"]
         difficulty_text = get_difficulty_class_text(difficulty_num)
-        set_info = bomb.get_set(chart_info["included-in"])
+        # print(chart_info)
+        try:
+            set_info = bomb.get_set(chart_info["included-in"])
+        except Exception:
+            continue
         set_id = set_info["id"]
         music_name = set_info["music-name"]
         r = Decimal(set_info["r"] if None else 0).quantize(Decimal("1"), rounding="ROUND_HALF_UP")
@@ -155,7 +161,7 @@ def draw_best20(user_id: str):
         illustration_path = os.path.join(resource_path, f"{set_id}.webp")
         try:
             illustration_image = get_illustration_image(illustration_path, 408, 230)
-        except:
+        except Exception:
             continue
 
         # 底部白色背景
@@ -165,23 +171,24 @@ def draw_best20(user_id: str):
         # 曲绘
         image.alpha_composite(illustration_image, (x, y))
         # 难度标志背景
-        image.alpha_composite(difficulty_parallelograms[difficulty_num])
+        # print(difficulty_num)
+        image.alpha_composite(difficulty_parallelograms[difficulty_num], (x - 72, y + 138))
         # 难度标志文字（类型+定级）
         image = draw_text(image, (x + 16, y + 163), f"{difficulty_text} {difficulty_value}", 26, phi_font_path,
                           anchor="mm")
         # 难度标志文件（定值）
-        image = draw_text(image, (x + 9, y + 198), f"R: {r}", 38, phi_font_path)
+        image = draw_text(image, (x + 9, y + 198), f"R: {r}", 38, phi_font_path, anchor="mm")
         # 曲名
-        image = draw_text(image, (x + 655, y + 44), f"{music_name}", 32, phi_font_path)
+        image = draw_text(image, (x + 655, y + 44), f"{music_name}", 32, phi_font_path, anchor="mm")
         # 分数
-        image = draw_text(image, (x + 530, y + 131), f"{score}".zfill(7), 37, phi_font_path)
+        image = draw_text(image, (x + 530, y + 131), f"{score}".zfill(7), 37, phi_font_path, anchor="ls")
         # Acc
         accuracy = Decimal((perfect + good * 0.5) / (perfect + good + miss) * 100.0).quantize(Decimal("0.01"),
                                                                                               rounding="ROUND_HALF_UP")
-        image = draw_text(image, (x + 738, y + 131), f"{accuracy}%", 27, phi_font_path)
+        image = draw_text(image, (x + 738, y + 131), f"{accuracy}%", 27, phi_font_path, anchor="ls")
         # 成绩类型图标
         rank_image = get_score_rank_image(score)
-        rank_image = rank_image.resize((115, 115), Image.ANTIALIAS)
+        rank_image = rank_image.resize((115, 115), Resampling.LANCZOS)
         image.alpha_composite(rank_image, (x + 392, y + 80))
         # 成绩细节
         image = draw_text(image, (x + 525, y + 190), "Perfect", 22, phi_font_path, (255, 183, 0, 255), anchor="ls")
@@ -201,6 +208,7 @@ def draw_best20(user_id: str):
 
 
 if __name__ == '__main__':
-    img = draw_best20("Taskeren", BombApi("http://localhost:10443/v1").get_user_best_records_r_value(
-        "27c479a9-28eb-4b8e-990f-71f790ee02b2"))
+    b = BombApi("http://43.142.173.63:10443/v1")
+    # print(b.get_user_by_name("Taskeren"))
+    img = draw_best20(b, "3400cba2-cd86-43d3-ace4-0da1a92481c9")
     img.show("The Record")
