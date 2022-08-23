@@ -61,7 +61,7 @@ def get_account(qq_id: str):
         return False, ""
 
 
-@sv.on_prefix(('/dyR', './dyr'))
+@sv.on_prefix(('/dyR', '/dyr'))
 async def command_r_calc(bot, ev: CQEvent):
     args = ev.message.extract_plain_text().strip().split()
 
