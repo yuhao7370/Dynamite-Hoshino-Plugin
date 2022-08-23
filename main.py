@@ -1,29 +1,3 @@
-# noinspection SpellCheckingInspection
-"""
-根据 Apache 协议在此列出文件修改：
-
-将以下方法移除：
-- img_alpha
-
-将以下函数移动到 `best20image.py` 中：
-- open_img 改名为 open_image
-- genparallogram 改名为 get_parallelogram_image
-- song_illu_prehandle 改名为 get_illustration_image
-- 将 DrawText 类合并简化为 draw_text
-- ranks 改名为 get_score_rank_image
-
-将以下函数移动到 `r_calc.py` 中：
-- case
-- arrc
-- EVALCPOLY 改名为 eval_chebyshev_poly
-- Chebyshev 改名为 calc_r
-
-修改本文文件中的以下方法：
-- 除 dyb20pic 外均改变函数与/或变量名称
-- dyb20pic 将图片生成部分抽取到 `best20image.py` 中的 draw_best20 函数中
-
-"""
-
 import base64
 import io
 import json
@@ -87,7 +61,7 @@ def get_account(qq_id: str):
         return False, ""
 
 
-@sv.on_prefix('/dyR')
+@sv.on_prefix(('/dyR', './dyr'))
 async def command_r_calc(bot, ev: CQEvent):
     args = ev.message.extract_plain_text().strip().split()
 
