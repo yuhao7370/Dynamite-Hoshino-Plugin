@@ -144,7 +144,7 @@ def draw_best20(bomb: BombApi, user_id: str):
             continue
         set_id = set_info["id"]
         music_name = set_info["music-name"]
-        r = Decimal(record["r"]).quantize(Decimal("1"), rounding="ROUND_HALF_UP")
+        r = Decimal(record["r"] or 0).quantize(Decimal("1"), rounding="ROUND_HALF_UP")
         total_r += r
 
         # 绘制
