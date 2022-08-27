@@ -9,7 +9,7 @@
 特别感谢[@Crazy___Bull](https://space.bilibili.com/335803482)提供的R值拟合公式以及[@Taskeren-3](https://space.bilibili.com/27656565)的Explode后端
 
 
-**该插件堆满了屎山且不保证后续更新**
+**该插件堆满了不保证后续更新**
 
 # 使用方法
 
