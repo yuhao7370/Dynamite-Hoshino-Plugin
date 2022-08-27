@@ -105,21 +105,14 @@ class BombApi:
     def end_review(self, set_id, status: bool):
         return decode_json(self.post_content(f"{self.api_url}/set/{set_id}/review/end", json_data={"status": status}))
 
-
-if __name__ == '__main__':
-    example_user_id = "3400cba2-cd86-43d3-ace4-0da1a92481c9"
-    example_set_id = "0nz4pnpk1u64phyhqvyh1gi6"
-    example_chart_id = "ki1ck8wqlntsyl48688e0159"
-
-    api = BombApi("http://43.142.173.63:10443/v1", username="Taskeren", password="123456")
-
+    #test
     # print(api.get_set(example_set_id))
     # print(api.get_set_by_name("Intel Sound Logo"))
     # print(api.get_chart(example_chart_id))
     # print(api.get_user(example_user_id))
     # print(api.get_user_by_name("Taskeren"))
     # print(api.get_user_best_records_score(example_user_id))
-    print(api.get_user_best_records_r_value(example_user_id))
+    # print(api.get_user_best_records_r_value(example_user_id))
     # print(api.get_set_by_chart_id(example_chart_id))
     # print(api.ping_auth())
     # print(api.register_user("Taskeren-Bot", "1024"))

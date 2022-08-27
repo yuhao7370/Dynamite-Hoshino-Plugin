@@ -113,7 +113,7 @@ def get_score_rank_image(score) -> Image.Image:
         return open_image(os.path.join(resource_path, "ranks/UI1_Difficulties_9.png"))
 
 
-def draw_best20(bomb: BombApi, user_id: str):
+async def draw_best20(bomb: BombApi, user_id: str):
     username = bomb.get_user(user_id)["username"]
     records = bomb.get_user_best_records_r_value(user_id)
 
@@ -204,10 +204,3 @@ def draw_best20(bomb: BombApi, user_id: str):
     # 总R值
     image = draw_text(image, (1430, 430), f"{total_r}", 68, phi_font_path, anchor="ls")
     return image
-
-
-if __name__ == '__main__':
-    b = BombApi("http://43.142.173.63:10443/v1")
-    # print(b.get_user_by_name("Taskeren"))
-    img = draw_best20(b, "3400cba2-cd86-43d3-ace4-0da1a92481c9")
-    img.show("The Record")

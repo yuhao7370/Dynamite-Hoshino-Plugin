@@ -38,19 +38,6 @@ def img2b64(img: Image.Image) -> str:
     return 'base64://' + base64_str
 
 
-def image_draw(msg):
-    font_path = os.path.join(os.path.dirname(__file__), 'sy.ttf')
-    font1 = ImageFont.truetype(font_path, 16)
-    width, height = font1.getsize_multiline(msg.strip())
-    img = Image.new("RGB", (width + 20, height + 20), (255, 255, 255))
-    draw = ImageDraw.Draw(img)
-    draw.text((10, 10), msg, fill=(0, 0, 0), font=font1)
-    b_io = io.BytesIO()
-    img.save(b_io, format="JPEG")
-    base64_str = 'base64://' + base64.b64encode(b_io.getvalue()).decode()
-    return base64_str
-
-
 def get_account(qq_id: str):
     account_path = os.path.join(os.path.dirname(__file__), 'account.json')
     with open(account_path, "r", encoding='utf8') as f:
@@ -103,6 +90,9 @@ async def command_bind(bot, ev: CQEvent):
     qq_id = ev.user_id
     username = ev.message.extract_plain_text().strip()
     username = username.strip()
+    if(username == ""):
+        await bot.finish(ev, f"绑定失败，请输入您的账号昵称")
+    
     try:
         account_path = os.path.join(os.path.dirname(__file__), 'account.json')
         with open(account_path, "r", encoding='utf8') as f:
@@ -131,7 +121,7 @@ async def command_bind(bot, ev: CQEvent):
         await bot.send(ev, f"绑定失败，{e}")
 
 
-@sv.on_prefix('/dyb20')
+@sv.on_prefix(('/dyb20', '/b20', '/exb20'))
 async def command_dyb20pic(bot, ev: CQEvent):
     qq_id = ev.user_id
     args = ev.message.extract_plain_text().strip().split()
@@ -152,7 +142,7 @@ async def command_dyb20pic(bot, ev: CQEvent):
     await bot.send(ev, f'正在查询{username}的Best20成绩', at_sender=True)
 
     try:
-        img = draw_best20(bomb, user_id)
+        img = await draw_best20(bomb, user_id)
         base64str = img2b64(img)
         msg = MessageSegment.image(base64str)
         await bot.send(ev, msg)
@@ -175,7 +165,7 @@ async def command_nyabye(bot, ev: CQEvent):
             await bot.finish(ev, voice_rec)
     except Exception:
         flag = True
-    if flag:
+    if(flag == True):
         res_path = os.path.join(os.path.dirname(__file__), "res")
         record_path = os.path.join(res_path, "NyaBye130")
         file_list = search_files(record_path, "wav")
