@@ -172,3 +172,14 @@ async def command_nyabye(bot, ev: CQEvent):
         record_path = random.choice(file_list)
         voice_rec = MessageSegment.record(f'file:///{os.path.abspath(record_path)}')
         await bot.send(ev, voice_rec)
+
+@sv.on_prefix(('/aplo', '/Aplo', '/Aploplex', '/aploplex'))
+async def command_nyabye(bot, ev: CQEvent):
+    args = ev.message.extract_plain_text().strip().split()
+
+    res_path = os.path.join(os.path.dirname(__file__), "res")
+    record_path = os.path.join(res_path, "Aploplex")
+    file_list = search_files(record_path, "wav")
+    record_path = random.choice(file_list)
+    voice_rec = MessageSegment.record(f'file:///{os.path.abspath(record_path)}')
+    await bot.send(ev, voice_rec)
