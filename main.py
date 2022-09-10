@@ -18,7 +18,7 @@ from .bomb import BombApi
 
 sv = Service('Dynamite', manage_priv=priv.ADMIN, enable_on_default=True, visible=True)
 
-bomb = BombApi("http://43.142.173.63:10443/v1")
+bomb = BombApi("http://43.142.173.63:10483/v1")
 
 
 def search_files(directory, file_extension):
