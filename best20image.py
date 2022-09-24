@@ -112,6 +112,14 @@ def get_score_rank_image(score) -> Image.Image:
     else:
         return open_image(os.path.join(resource_path, "ranks/UI1_Difficulties_9.png"))
 
+def downloadimg(url, path):
+    import requests
+    r = requests.get(url, stream=True) 
+    with open(path, 'wb') as f:
+        f.write(r.content)
+        f.flush()
+        f.close()
+    print(f"获取完成")
 
 async def draw_best20(bomb: BombApi, user_id: str):
     username = bomb.get_user(user_id)["username"]
@@ -161,6 +169,15 @@ async def draw_best20(bomb: BombApi, user_id: str):
         try:
             illustration_image = get_illustration_image(illustration_path, 408, 230)
         except Exception:
+            try:
+                url = f"http://124.223.85.207:5244/d/download/cover/480x270_jpg/{set_id}"
+                downloadimg(url, illustration_path)
+                illustration_image = get_illustration_image(illustration_path, 408, 230)
+                print(set_id)
+            # f"http://124.223.85.207:5244/d/download/cover/480x270_jpg/{set_id}"
+            except Exception:
+                continue
+            print(set_id)
             continue
 
         # 底部白色背景
