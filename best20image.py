@@ -131,6 +131,7 @@ async def draw_best20(bomb: BombApi, user_id: str):
 
     total_r = 0
     count = 1
+    # print(records)
     for record in records:
         # 收集数据
         score = record["score"]
@@ -138,6 +139,7 @@ async def draw_best20(bomb: BombApi, user_id: str):
         good = record["good"]
         miss = record["miss"]
         chart_id = record["chart-id"]
+        
         try:
             chart_info = bomb.get_chart(chart_id)
         except Exception:
@@ -154,7 +156,7 @@ async def draw_best20(bomb: BombApi, user_id: str):
         music_name = set_info["music-name"]
         r = Decimal(record["r"] or 0).quantize(Decimal("1"), rounding="ROUND_HALF_UP")
         total_r += r
-
+        # print(music_name)
         # 绘制
         if count % 2 == 0:
             x = x0 + 1097
