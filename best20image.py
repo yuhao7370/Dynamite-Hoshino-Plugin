@@ -199,8 +199,11 @@ async def draw_best20(bomb: BombApi, user_id: str):
         # 分数
         image = draw_text(image, (x + 530, y + 131), f"{score}".zfill(7), 37, phi_font_path, anchor="ls")
         # Acc
-        accuracy = Decimal((perfect + good * 0.5) / (perfect + good + miss) * 100.0).quantize(Decimal("0.01"),
-                                                                                              rounding="ROUND_HALF_UP")
+        try:
+            accuracy = Decimal((perfect + good * 0.5) / (perfect + good + miss) * 100.0).quantize(Decimal("0.01"),
+                                                                                                rounding="ROUND_HALF_UP")
+        except:
+            accuracy = "0.00"                                                                               
         image = draw_text(image, (x + 738, y + 131), f"{accuracy}%", 27, phi_font_path, anchor="ls")
         # 成绩类型图标
         rank_image = get_score_rank_image(score)
