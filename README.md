@@ -49,5 +49,5 @@
 | /dya            | 上传头像        |  无   可用参数       | 将自己的qq头像作为游戏头像      |
 | /dyR        | 计算R值 |  [Rating acc] [Rating Perfect Good Miss]     | 通过定数+acc或者定数+误差计算R值     |
 | /NyaBye130          | 发送喵拜语音包       |  [overdose]          | 随机发送喵拜语音包      |
-| /aplo          | 发送aplo语音包       |  无可用参数      | 随机发送喵拜语音包      |
+| /aplo          | 发送aplo语音包       |  无可用参数      | 随机发送aplo语音包      |
 
