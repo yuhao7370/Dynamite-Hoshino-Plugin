@@ -1,4 +1,5 @@
 import base64
+from enum import Flag
 import io
 import json
 import os
@@ -12,6 +13,7 @@ from PIL import Image, ImageDraw, ImageFont
 from hoshino import Service, priv
 from hoshino.typing import CQEvent, MessageSegment
 
+from .avatar import *
 from .r_calc import calc_r
 from .best20image import draw_best20
 from .bomb import BombApi
@@ -47,6 +49,19 @@ def get_account(qq_id: str):
     except Exception:
         return False, ""
 
+@sv.on_prefix(('/dya', '/dyavatar'))
+async def command_avatar_upload(bot, ev: CQEvent):
+    qq_id = ev.user_id
+    flag, user_id = get_account(str(qq_id))
+    if not flag:
+        await bot.finish(ev, f'您还未绑定，请用/dybind指令绑定', at_sender=True)
+        return
+    flag = upload_avatar(qq_id, user_id)
+    username = bomb.get_user(user_id)["username"]
+    if(flag == True):
+        await bot.finish(ev, f'玩家{username}已更新为Q{qq_id}的头像', at_sender=True)
+    else:
+        await bot.finish(ev, f'头像更新失败', at_sender=True)
 
 @sv.on_prefix(('/dyR', '/dyr'))
 async def command_r_calc(bot, ev: CQEvent):
@@ -125,8 +140,8 @@ async def command_bind(bot, ev: CQEvent):
 async def command_dyb20pic(bot, ev: CQEvent):
     qq_id = ev.user_id
     args = ev.message.extract_plain_text().strip().split()
-    if(str(qq_id) == "2307957938"):
-        await bot.finish(ev, f'不能查询NyaBye130的Best20成绩', at_sender=True)
+    # if(str(qq_id) == "2307957938"):
+    #     await bot.finish(ev, f'不能查询NyaBye130的Best20成绩', at_sender=True)
 
     if len(args) == 1:
         username = args[0]
