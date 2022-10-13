@@ -58,14 +58,14 @@ class BombApi:
     def get_set(self, set_id):
         return decode_json(self.get_content(f"{self.api_url}/set/{set_id}"))
 
-    def get_set_by_name(self, music_name):
-        return decode_json(self.post_content(f"{self.api_url}/set/by-name", json_data=music_name))
+    def get_set_by_name(self, musicName):
+        return decode_json(self.post_content(f"{self.api_url}/set/by-name", json_data=musicName))
 
-    def get_set_by_chart_id(self, chart_id):
-        return decode_json(self.post_content(f"{self.api_url}/set/by-chart", json_data=chart_id))
+    def get_set_by_chartId(self, chartId):
+        return decode_json(self.post_content(f"{self.api_url}/set/by-chart", json_data=chartId))
 
-    def get_chart(self, chart_id):
-        return decode_json(self.get_content(f"{self.api_url}/chart/{chart_id}"))
+    def get_chart(self, chartId):
+        return decode_json(self.get_content(f"{self.api_url}/chart/{chartId}"))
 
     def get_user(self, user_id):
         return decode_json(self.get_content(f"{self.api_url}/user/{user_id}"))
@@ -79,6 +79,9 @@ class BombApi:
     def get_user_best_records_r_value(self, user_id):
         return decode_json(self.get_content(f"{self.api_url}/user/{user_id}/best20/r"))
 
+    def get_user_recent_records(self, user_id):
+        return decode_json(self.get_content(f"{self.api_url}/user/{user_id}/last20"))
+
     def register_user(self, username, password):
         return decode_json(self.post_content(f"{self.api_url}/management/user/register",
                                              json_data={"username": username, "password": password}))
@@ -89,8 +92,8 @@ class BombApi:
     def get_set_details(self, set_id):
         return decode_json(self.get_content(f"{self.api_url}/management/set/{set_id}"))
 
-    def get_chart_details(self, chart_id):
-        return decode_json(self.get_content(f"{self.api_url}/management/set/{chart_id}"))
+    def get_chart_details(self, chartId):
+        return decode_json(self.get_content(f"{self.api_url}/management/set/{chartId}"))
 
     def get_reviews(self):
         return decode_json(self.get_content(f"{self.api_url}/set/reviews"))
@@ -108,12 +111,12 @@ class BombApi:
     #test
     # print(api.get_set(example_set_id))
     # print(api.get_set_by_name("Intel Sound Logo"))
-    # print(api.get_chart(example_chart_id))
+    # print(api.get_chart(example_chartId))
     # print(api.get_user(example_user_id))
     # print(api.get_user_by_name("Taskeren"))
     # print(api.get_user_best_records_score(example_user_id))
     # print(api.get_user_best_records_r_value(example_user_id))
-    # print(api.get_set_by_chart_id(example_chart_id))
+    # print(api.get_set_by_chartId(example_chartId))
     # print(api.ping_auth())
     # print(api.register_user("Taskeren-Bot", "1024"))
     # print(api.get_user_details(example_user_id))

@@ -10,7 +10,7 @@ tan75 = 0.266
 resource_path = os.path.join(os.path.dirname(__file__), "res")
 phi_font_path = os.path.join(os.path.dirname(__file__), 'sy.ttf')
 
-difficulty_texts = [
+difficultyTexts = [
     "UNKNOWN",
     "CASUAL",
     "NORMAL",
@@ -22,7 +22,7 @@ difficulty_texts = [
 
 
 def get_difficulty_class_text(difficulty_class):
-    return difficulty_texts[difficulty_class]
+    return difficultyTexts[difficulty_class]
 
 
 def open_image(image_path: str) -> Image.Image:
@@ -125,38 +125,44 @@ async def draw_best20(bomb: BombApi, user_id: str):
     username = bomb.get_user(user_id)["username"]
     records = bomb.get_user_best_records_r_value(user_id)
 
+    # print(records)
+
     background_path = os.path.join(resource_path, "BackGround.png")
     image = open_image(background_path)
     x0, y0 = 196, 682
 
     total_r = 0
     count = 1
+    # print("\n\n\n\n\n\n")
     # print(records)
+
     for record in records:
         # 收集数据
+        # print(record)
         score = record["score"]
         perfect = record["perfect"]
         good = record["good"]
         miss = record["miss"]
-        chart_id = record["chart-id"]
-        
+        chartId = record["chartId"]
+            
         try:
-            chart_info = bomb.get_chart(chart_id)
+            chart_info = bomb.get_chart(chartId)
+            # print(chart_info)
         except Exception:
             continue
-        difficulty_num = chart_info["difficulty-class"]
-        difficulty_value = chart_info["difficulty-value"]
-        difficulty_text = get_difficulty_class_text(difficulty_num)
+        difficultyClass = chart_info["difficultyClass"]
+        difficultyValue = chart_info["difficultyValue"]
+        difficultyText = get_difficulty_class_text(difficultyClass)
         # print(chart_info)
         try:
-            set_info = bomb.get_set(chart_info["included-in"])
+            setInfo = bomb.get_set(chart_info["parentSetId"])
         except Exception:
             continue
-        set_id = set_info["id"]
-        music_name = set_info["music-name"]
+        set_id = setInfo["id"]
+        musicName = setInfo["musicName"]
         r = Decimal(record["r"] or 0).quantize(Decimal("1"), rounding="ROUND_HALF_UP")
         total_r += r
-        # print(music_name)
+        # print(musicName)
         # 绘制
         if count % 2 == 0:
             x = x0 + 1097
@@ -175,11 +181,11 @@ async def draw_best20(bomb: BombApi, user_id: str):
                 url = f"http://124.223.85.207:5244/d/download/cover/480x270_jpg/{set_id}"
                 downloadimg(url, illustration_path)
                 illustration_image = get_illustration_image(illustration_path, 408, 230)
-                print(set_id)
+                # print(set_id)
             # f"http://124.223.85.207:5244/d/download/cover/480x270_jpg/{set_id}"
             except Exception:
                 continue
-            print(set_id)
+            # print(set_id)
             continue
 
         # 底部白色背景
@@ -189,15 +195,15 @@ async def draw_best20(bomb: BombApi, user_id: str):
         # 曲绘
         image.alpha_composite(illustration_image, (x, y))
         # 难度标志背景
-        # print(difficulty_num)
-        image.alpha_composite(difficulty_parallelograms[difficulty_num], (x - 72, y + 138))
+        # print(difficultyClass)
+        image.alpha_composite(difficulty_parallelograms[difficultyClass], (x - 72, y + 138))
         # 难度标志文字（类型+定级）
-        image = draw_text(image, (x + 16, y + 163), f"{difficulty_text} {difficulty_value}", 26, phi_font_path,
+        image = draw_text(image, (x + 16, y + 163), f"{difficultyText} {difficultyValue}", 26, phi_font_path,
                           anchor="mm")
         # 难度标志文件（定值）
         image = draw_text(image, (x + 9, y + 198), f"R: {r}", 38, phi_font_path, anchor="mm")
         # 曲名
-        image = draw_text(image, (x + 655, y + 44), f"{music_name}", 32, phi_font_path, anchor="mm")
+        image = draw_text(image, (x + 655, y + 44), f"{musicName}", 32, phi_font_path, anchor="mm")
         # 分数
         image = draw_text(image, (x + 530, y + 131), f"{score}".zfill(7), 37, phi_font_path, anchor="ls")
         # Acc

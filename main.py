@@ -135,6 +135,32 @@ async def command_bind(bot, ev: CQEvent):
         traceback.print_exc()
         await bot.send(ev, f"绑定失败，{e}")
 
+@sv.on_prefix(('/dyrecent', '/dyre', '/exre', '/exrecent'))
+async def command_dyrecentpic(bot, ev: CQEvent):
+    qq_id = ev.user_id
+    args = ev.message.extract_plain_text().strip().split()
+    # if(str(qq_id) == "2307957938"):
+    #     await bot.finish(ev, f'不能查询NyaBye130的Best20成绩', at_sender=True)
+
+    if len(args) == 1:
+        username = args[0]
+        user_id = bomb.get_user_by_name(username)["id"]
+    else:
+        flag, user_id = get_account(str(qq_id))
+        if not flag:
+            await bot.finish(ev, f'您还未绑定，请用/dybind指令绑定', at_sender=True)
+            return
+        else:
+            username = bomb.get_user(user_id)["username"]
+
+    await bot.send(ev, username)
+    try:
+        msg = bomb.get_user_recent_records(username)
+        print(msg)
+        await bot.send(ev, msg)
+    except Exception as e:
+        await bot.send(ev, f"查询时出现错误：{e}")
+
 
 @sv.on_prefix(('/dyb20', '/b20', '/exb20'))
 async def command_dyb20pic(bot, ev: CQEvent):
@@ -189,7 +215,7 @@ async def command_nyabye(bot, ev: CQEvent):
         await bot.send(ev, voice_rec)
 
 @sv.on_prefix(('/aplo', '/Aplo', '/Aploplex', '/aploplex'))
-async def command_nyabye(bot, ev: CQEvent):
+async def command_aplo(bot, ev: CQEvent):
     args = ev.message.extract_plain_text().strip().split()
 
     res_path = os.path.join(os.path.dirname(__file__), "res")
