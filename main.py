@@ -10,12 +10,12 @@ from io import BytesIO
 
 from PIL import Image, ImageDraw, ImageFont
 
-from hoshino import Service, priv
+from hoshino import Service, priv, util
 from hoshino.typing import CQEvent, MessageSegment
 
 from .avatar import *
 from .r_calc import calc_r
-from .best20image import draw_best20
+from .best20image import *
 from .bomb import BombApi
 
 sv = Service('Dynamite', manage_priv=priv.ADMIN, enable_on_default=True, visible=True)
@@ -153,11 +153,50 @@ async def command_dyrecentpic(bot, ev: CQEvent):
         else:
             username = bomb.get_user(user_id)["username"]
 
-    await bot.send(ev, username)
     try:
-        msg = bomb.get_user_recent_records(username)
-        print(msg)
-        await bot.send(ev, msg)
+        recentDict = bomb.get_user_recent_records(user_id)
+        record = recentDict[0]
+        
+        score = record["score"]
+        perfect = record["perfect"]
+        good = record["good"]
+        miss = record["miss"]
+        chartId = record["chartId"]
+            
+        try:
+            chart_info = bomb.get_chart(chartId)
+            # print(chart_info)
+        except Exception:
+            await bot.finish(ev, f"查询时出现错误：{Exception}")
+            return
+        difficultyClass = chart_info["difficultyClass"]
+        difficultyValue = chart_info["difficultyValue"]
+        difficultyText = get_difficulty_class_text(difficultyClass)
+        # print(chart_info)
+        try:
+            setInfo = bomb.get_set(chart_info["parentSetId"])
+        except Exception:
+            await bot.finish(ev, f"查询时出现错误：{Exception}")
+            return
+        set_id = setInfo["id"]
+        musicName = setInfo["musicName"]
+        r = Decimal(record["r"] or 0).quantize(Decimal("1"), rounding="ROUND_HALF_UP")
+        
+        illustration_path = os.path.join(resource_path, f"{set_id}.webp")
+        try:
+            illustration_image = get_illustration_image(illustration_path, 408, 230)
+        except Exception:
+            try:
+                url = f"http://124.223.85.207:5244/d/download/cover/480x270_jpg/{set_id}"
+                downloadimg(url, illustration_path)
+                illustration_image = get_illustration_image(illustration_path, 408, 230)
+                # print(set_id)
+            # f"http://124.223.85.207:5244/d/download/cover/480x270_jpg/{set_id}"
+            except Exception:
+                await bot.finish(ev, f"查询时出现错误：{Exception}")
+                return
+        img = MessageSegment.image(util.pic2b64(illustration_image))
+        await bot.send(ev, f"{img}\n{musicName} {score}\n{perfect}-{good}-{miss}")
     except Exception as e:
         await bot.send(ev, f"查询时出现错误：{e}")
 
