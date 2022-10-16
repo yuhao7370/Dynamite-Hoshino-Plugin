@@ -15,6 +15,7 @@ from hoshino.typing import CQEvent, MessageSegment
 
 from .avatar import *
 from .r_calc import calc_r
+from .rrank import get_tops
 from .best20image import *
 from .bomb import BombApi
 
@@ -62,6 +63,16 @@ async def command_avatar_upload(bot, ev: CQEvent):
         await bot.finish(ev, f'玩家{username}已更新为Q{qq_id}的头像', at_sender=True)
     else:
         await bot.finish(ev, f'头像更新失败', at_sender=True)
+
+@sv.on_prefix(('/dyleaderboard', '/dyl'))
+async def command_dyleaderboard(bot, ev: CQEvent):
+    await bot.send(ev, "正在更新排行榜")
+    tops = get_tops()
+    msg = "Explode Leaderboard:\n"
+    for i in range(0, len(tops)):
+        msg += f"#{i + 1}\n"
+        msg += f"{tops[i]['username']}  R:{tops[i]['R']} \n"
+    await bot.finish(ev, msg)
 
 @sv.on_prefix(('/dyR', '/dyr'))
 async def command_r_calc(bot, ev: CQEvent):
@@ -153,6 +164,7 @@ async def command_dyrecentpic(bot, ev: CQEvent):
         else:
             username = bomb.get_user(user_id)["username"]
 
+    await bot.send(ev, f'正在查询{username}的Recent成绩', at_sender=True)
     try:
         recentDict = bomb.get_user_recent_records(user_id)
         record = recentDict[0]
@@ -181,7 +193,11 @@ async def command_dyrecentpic(bot, ev: CQEvent):
         set_id = setInfo["id"]
         musicName = setInfo["musicName"]
         r = Decimal(record["r"] or 0).quantize(Decimal("1"), rounding="ROUND_HALF_UP")
-        
+        try:
+            accuracy = Decimal((perfect + good * 0.5) / (perfect + good + miss) * 100.0).quantize(Decimal("0.01"),
+                                                                                                rounding="ROUND_HALF_UP")
+        except:
+            accuracy = "0.00"     
         illustration_path = os.path.join(resource_path, f"{set_id}.webp")
         try:
             illustration_image = get_illustration_image(illustration_path, 408, 230)
@@ -196,7 +212,7 @@ async def command_dyrecentpic(bot, ev: CQEvent):
                 await bot.finish(ev, f"查询时出现错误：{Exception}")
                 return
         img = MessageSegment.image(util.pic2b64(illustration_image))
-        await bot.send(ev, f"{img}\n{musicName} {score}\n{perfect}-{good}-{miss}")
+        await bot.send(ev, f"{img}\n{musicName} {difficultyText}{difficultyValue}\n{score} {accuracy}% R:{r}\n{perfect}-{good}-{miss}")
     except Exception as e:
         await bot.send(ev, f"查询时出现错误：{e}")
 
