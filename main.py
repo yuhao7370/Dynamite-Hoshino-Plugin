@@ -16,12 +16,13 @@ from hoshino.typing import CQEvent, MessageSegment
 from .avatar import *
 from .r_calc import calc_r
 from .rrank import get_tops
+from .register import register
 from .best20image import *
 from .bomb import BombApi
 
 sv = Service('Dynamite', manage_priv=priv.ADMIN, enable_on_default=True, visible=True)
 
-bomb = BombApi("http://43.142.173.63:10483/v1")
+bomb = BombApi("http://43.142.173.63:10483/bomb/v2")
 
 
 def search_files(directory, file_extension):
@@ -50,6 +51,28 @@ def get_account(qq_id: str):
     except Exception:
         return False, ""
 
+@sv.on_prefix(('/dyreg'))
+async def command_register_admin(bot, ev: CQEvent):
+    admin_list = ["2737723325", "3070190799", "1580885360", "520127606", "1255710289", "2539990262"]
+    qq_id = ev.user_id
+    if(str(qq_id) not in admin_list):
+        await bot.finish(ev, f'您不是Explode管理员，请找管理员注册账号', at_sender=True)
+        return
+    
+    args = ev.message.extract_plain_text().strip().split()
+    try:
+        username = args[0]
+        password = args[1]
+    except:
+        await bot.finish(ev, f'格式为/dyreg 昵称 密码', at_sender=True)
+        return
+    
+    flag, msg = register(username, password)
+    if(flag == True):
+        await bot.finish(ev, f'玩家{username}注册成功，uid为{msg}', at_sender=True)
+    else:
+        await bot.finish(ev, f'注册时出现问题: {msg}', at_sender=True)
+
 @sv.on_prefix(('/dya', '/dyavatar'))
 async def command_avatar_upload(bot, ev: CQEvent):
     qq_id = ev.user_id
@@ -64,15 +87,15 @@ async def command_avatar_upload(bot, ev: CQEvent):
     else:
         await bot.finish(ev, f'头像更新失败', at_sender=True)
 
-@sv.on_prefix(('/dyleaderboard', '/dyl'))
-async def command_dyleaderboard(bot, ev: CQEvent):
-    await bot.send(ev, "正在更新排行榜")
-    tops = get_tops()
-    msg = "Explode Leaderboard:\n"
-    for i in range(0, len(tops)):
-        msg += f"#{i + 1}\n"
-        msg += f"{tops[i]['username']}  R:{tops[i]['R']} \n"
-    await bot.finish(ev, msg)
+# @sv.on_prefix(('/dyleaderboard', '/dyl'))
+# async def command_dyleaderboard(bot, ev: CQEvent):
+#     await bot.send(ev, "正在更新排行榜")
+#     tops = get_tops()
+#     msg = "Explode Leaderboard:\n"
+#     for i in range(0, len(tops)):
+#         msg += f"#{i + 1}\n"
+#         msg += f"{tops[i]['username']}  R:{tops[i]['R']} \n"
+#     await bot.finish(ev, msg)
 
 @sv.on_prefix(('/dyR', '/dyr'))
 async def command_r_calc(bot, ev: CQEvent):
@@ -203,11 +226,11 @@ async def command_dyrecentpic(bot, ev: CQEvent):
             illustration_image = get_illustration_image(illustration_path, 408, 230)
         except Exception:
             try:
-                url = f"http://124.223.85.207:5244/d/download/cover/480x270_jpg/{set_id}"
+                url = f"http://43.142.173.63:5244/d/download/cover/480x270_jpg/{set_id}"
                 downloadimg(url, illustration_path)
                 illustration_image = get_illustration_image(illustration_path, 408, 230)
                 # print(set_id)
-            # f"http://124.223.85.207:5244/d/download/cover/480x270_jpg/{set_id}"
+            # f"http://43.142.173.63:5244/d/download/cover/480x270_jpg/{set_id}"
             except Exception:
                 await bot.finish(ev, f"查询时出现错误：{Exception}")
                 return
@@ -233,6 +256,7 @@ async def command_dyb20pic(bot, ev: CQEvent):
             await bot.finish(ev, f'您还未绑定，请用/dybind指令绑定', at_sender=True)
             return
         else:
+            # print(bomb.get_user(user_id))
             username = bomb.get_user(user_id)["username"]
 
     await bot.send(ev, f'正在查询{username}的Best20成绩', at_sender=True)

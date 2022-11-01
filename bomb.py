@@ -17,7 +17,7 @@ def decode_json(content):
 
 def get_error_message_or_none(response: requests.Response):
     try:
-        error = decode_json(response.text)["error"]
+        error = decode_json(response.text)["message"]
         return f"({response.status_code}) {error}"
     except Exception as ex:  # catch JSON serialization caused exceptions
         print(f"({response.status_code}) {response.text}")  # print the raw response text
@@ -56,7 +56,7 @@ class BombApi:
         return decode_json(self.get_content(f"{self.api_url}/management"))
 
     def get_set(self, set_id):
-        return decode_json(self.get_content(f"{self.api_url}/set/{set_id}"))
+        return decode_json(self.get_content(f"{self.api_url}/set/{set_id}"))["data"]
 
     def get_set_by_name(self, musicName):
         return decode_json(self.post_content(f"{self.api_url}/set/by-name", json_data=musicName))
@@ -65,19 +65,19 @@ class BombApi:
         return decode_json(self.post_content(f"{self.api_url}/set/by-chart", json_data=chartId))
 
     def get_chart(self, chartId):
-        return decode_json(self.get_content(f"{self.api_url}/chart/{chartId}"))
+        return decode_json(self.get_content(f"{self.api_url}/chart/{chartId}"))["data"]
 
     def get_user(self, user_id):
-        return decode_json(self.get_content(f"{self.api_url}/user/{user_id}"))
+        return decode_json(self.get_content(f"{self.api_url}/user/{user_id}"))["data"]
 
     def get_user_by_name(self, username):
         return decode_json(self.post_content(f"{self.api_url}/user/by-name", json_data=username))
 
     def get_user_best_records_score(self, user_id):
-        return decode_json(self.get_content(f"{self.api_url}/user/{user_id}/best20/s"))
+        return decode_json(self.get_content(f"{self.api_url}/user/{user_id}/best20/s"))["data"]
 
     def get_user_best_records_r_value(self, user_id):
-        return decode_json(self.get_content(f"{self.api_url}/user/{user_id}/best20/r"))
+        return decode_json(self.get_content(f"{self.api_url}/user/{user_id}/best"))["data"]
 
     def get_user_recent_records(self, user_id):
         return decode_json(self.get_content(f"{self.api_url}/user/{user_id}/last20"))
@@ -108,6 +108,13 @@ class BombApi:
     def end_review(self, set_id, status: bool):
         return decode_json(self.post_content(f"{self.api_url}/set/{set_id}/review/end", json_data={"status": status}))
 
+
+bomb = BombApi("http://43.142.173.63:10483/bomb/v2")
+
+if __name__ == "__main__":
+    # print(bomb.get_content("http://43.142.173.63:10483/bomb/v2/set/5fb517cf2496ed90dd81a0f1"))
+    # print(bomb.get_user("dbef7e85-0d5b-416a-82d0-fbffb420588e"))
+    print(bomb.get_user_best_records_r_value("dbef7e85-0d5b-416a-82d0-fbffb420588e"))
     #test
     # print(api.get_set(example_set_id))
     # print(api.get_set_by_name("Intel Sound Logo"))

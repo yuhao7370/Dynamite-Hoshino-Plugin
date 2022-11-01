@@ -1,4 +1,4 @@
-import os
+import os, json
 from decimal import Decimal
 
 from PIL import Image, ImageDraw, ImageFont
@@ -9,6 +9,7 @@ tan75 = 0.266
 
 resource_path = os.path.join(os.path.dirname(__file__), "res")
 phi_font_path = os.path.join(os.path.dirname(__file__), 'sy.ttf')
+         
 
 difficultyTexts = [
     "UNKNOWN",
@@ -121,10 +122,39 @@ def downloadimg(url, path):
         f.close()
     print(f"获取完成")
 
+songinfo_path = os.path.join(os.path.dirname(__file__), "songinfo.json")
+
+def get_chartInfo(chartid):
+    with open(songinfo_path, 'r', encoding='utf-8') as f:
+        songinfo = json.load(f)
+    return songinfo["chartInfo"][chartid]
+
+def get_setInfo(setid):
+    with open(songinfo_path, 'r', encoding='utf-8') as f:
+        songinfo = json.load(f)
+    return songinfo["setInfo"][setid]
+
+def insert_chartInfo(chartid, info):
+    with open(songinfo_path, 'r', encoding='utf-8') as f:
+        songinfo = json.load(f)
+    songinfo["chartInfo"][chartid] = info
+    with open(songinfo_path, 'w', encoding='utf8') as f:
+        json.dump(songinfo, f, indent=4, ensure_ascii=False)
+
+def insert_setInfo(setid, info):
+    with open(songinfo_path, 'r', encoding='utf-8') as f:
+        songinfo = json.load(f)
+    songinfo["setInfo"][setid] = info
+    with open(songinfo_path, 'w', encoding='utf8') as f:
+        json.dump(songinfo, f, indent=4, ensure_ascii=False)
+
+
 async def draw_best20(bomb: BombApi, user_id: str):
     username = bomb.get_user(user_id)["username"]
     records = bomb.get_user_best_records_r_value(user_id)
 
+    # with open(songinfo_path, 'r', encoding='utf-8') as f:
+    #     songinfo = json.load(f)
     # print(records)
 
     background_path = os.path.join(resource_path, "BackGround.png")
@@ -135,7 +165,7 @@ async def draw_best20(bomb: BombApi, user_id: str):
     count = 1
     # print("\n\n\n\n\n\n")
     # print(records)
-
+    print(records)
     for record in records:
         # 收集数据
         # print(record)
@@ -143,23 +173,20 @@ async def draw_best20(bomb: BombApi, user_id: str):
         perfect = record["perfect"]
         good = record["good"]
         miss = record["miss"]
-        chartId = record["chartId"]
-            
-        try:
-            chart_info = bomb.get_chart(chartId)
-            # print(chart_info)
-        except Exception:
-            continue
-        difficultyClass = chart_info["difficultyClass"]
-        difficultyValue = chart_info["difficultyValue"]
+        chartId = record["chart_id"]
+        
+        chart_info = bomb.get_chart(chartId)
+
+        print(chart_info)
+        difficultyClass = chart_info["difficulty_class"]
+        difficultyValue = chart_info["difficulty_value"]
         difficultyText = get_difficulty_class_text(difficultyClass)
         # print(chart_info)
-        try:
-            setInfo = bomb.get_set(chart_info["parentSetId"])
-        except Exception:
-            continue
+        
+        setInfo = bomb.get_set(chart_info["parent_set_id"])
+
         set_id = setInfo["id"]
-        musicName = setInfo["musicName"]
+        musicName = setInfo["music_name"]
         r = Decimal(record["r"] or 0).quantize(Decimal("1"), rounding="ROUND_HALF_UP")
         total_r += r
         # print(musicName)
@@ -178,11 +205,11 @@ async def draw_best20(bomb: BombApi, user_id: str):
             illustration_image = get_illustration_image(illustration_path, 408, 230)
         except Exception:
             try:
-                url = f"http://124.223.85.207:5244/d/download/cover/480x270_jpg/{set_id}"
+                url = f"http://43.142.173.63:5244/d/download/cover/480x270_jpg/{set_id}"
                 downloadimg(url, illustration_path)
                 illustration_image = get_illustration_image(illustration_path, 408, 230)
                 # print(set_id)
-            # f"http://124.223.85.207:5244/d/download/cover/480x270_jpg/{set_id}"
+            # f"http://43.142.173.63:5244/d/download/cover/480x270_jpg/{set_id}"
             except Exception:
                 continue
             # print(set_id)
@@ -231,4 +258,6 @@ async def draw_best20(bomb: BombApi, user_id: str):
     image = draw_text(image, (1430, 330), f"{username}", 68, phi_font_path, anchor="ls")
     # 总R值
     image = draw_text(image, (1430, 430), f"{total_r}", 68, phi_font_path, anchor="ls")
+    # with open(songinfo_path, 'w', encoding='utf8') as f:
+    #     json.dump(songinfo, f, indent=4, ensure_ascii=False)
     return image
