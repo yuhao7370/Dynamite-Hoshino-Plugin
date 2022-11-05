@@ -165,7 +165,7 @@ async def draw_best20(bomb: BombApi, user_id: str):
     count = 1
     # print("\n\n\n\n\n\n")
     # print(records)
-    print(records)
+    # print(records)
     for record in records:
         # 收集数据
         # print(record)
@@ -174,16 +174,13 @@ async def draw_best20(bomb: BombApi, user_id: str):
         good = record["good"]
         miss = record["miss"]
         chartId = record["chart_id"]
-        
-        chart_info = bomb.get_chart(chartId)
+        setInfo = record["set_info"]
+        chart_info = record["chart_info"]
 
-        print(chart_info)
         difficultyClass = chart_info["difficulty_class"]
         difficultyValue = chart_info["difficulty_value"]
         difficultyText = get_difficulty_class_text(difficultyClass)
         # print(chart_info)
-        
-        setInfo = bomb.get_set(chart_info["parent_set_id"])
 
         set_id = setInfo["id"]
         musicName = setInfo["music_name"]
